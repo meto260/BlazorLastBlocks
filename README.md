@@ -7,3 +7,4 @@
 * Blockchain servis sağlayıcıları kullanıldığından backend uygulaması gereksinimi olmadı.
 
 
+http://lastblocks.metinyakar.net
