@@ -1,0 +1,90 @@
+﻿@page "/"
+@using System.Numerics
+@using Newtonsoft.Json
+
+<PageTitle>Latest Blocks</PageTitle>
+
+<div style="border:1px solid lightgray; position:relative; height:24px; margin-bottom:20px;">
+    <div id="repeaterProgress" style="width:@(LoaderMove)%;"></div>
+</div>
+<table>
+    <tr>
+        <th>Number</th>
+        <th>BlockHash</th>
+        <th>Miner</th>
+        <th>TxCount</th>
+        <th>GasUsed</th>
+        <th>Size</th>
+    </tr>
+    @foreach (var tx in TxList) {
+        <tr @onclick="()=>RowClick(tx.BlockHash)">
+            <td>@tx.Number</td>
+            <td title="@tx.BlockHash">
+                @tx.BlockHash?.Substring(0,10) ...
+            </td>
+            <td>@tx.Miner</td>
+            <td>@tx.TransactionHashes?.Count()</td>
+            <td>@tx.GasUsed</td>
+            <td>@tx.Size</td>
+        </tr>
+        @if (tx.TransactionHashes?.Count() > 0) {
+            foreach (string txhash in tx.TransactionHashes) {
+                try {
+                    string display = SelectedBlockHash.Equals(txhash) ? "block" : "none";
+                    <tr style="display:@display;"></tr>
+                }
+                catch { }
+            }
+        }
+    }
+</table>
+@if (!string.IsNullOrEmpty(SelectedBlockHash)) {
+    <div id="showDetailDiv">
+        <div>
+            <table>
+                <tr>
+                    <td>
+                        <h4>BlockHash Transactions</h4>
+                    </td>
+                    <td>
+                        @SelectedBlockHash
+                    </td>
+                    <td>
+                        <button @onclick="()=>{ SelectedBlockHash=null; }">Close</button>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                @foreach (var hshs in TxList.Where(x => x.BlockHash.Equals(SelectedBlockHash)).Select(x => x.TransactionHashes)) {
+                    foreach (var hsh in hshs) {
+                        <tr @onclick="()=>TransactionClick(hsh)">
+                            <td title="@hsh">@(hsh.Substring(0,30))...</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(SelectedTx?.From) && SelectedTx.TransactionHash.Equals(hsh)) {
+                                    <table>
+                                        <tr>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Gas</th>
+                                            <th>Value</th>
+                                            <th>Input</th>
+                                            <th>Nonce</th>
+                                        </tr>
+                                        <tr>
+                                            <td title="@SelectedTx.From">@(SelectedTx.From.Substring(0,16))...</td>
+                                            <td title="@SelectedTx.To">@(SelectedTx.To.Substring(0,16))...</td>
+                                            <td>@SelectedTx.Gas</td>
+                                            <td>@SelectedTx.Value</td>
+                                            <td title="@SelectedTx.Input">@(SelectedTx.Input.Substring(0,16))...</td>
+                                            <td>@SelectedTx.Nonce</td>
+                                        </tr>
+                                    </table>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+}
