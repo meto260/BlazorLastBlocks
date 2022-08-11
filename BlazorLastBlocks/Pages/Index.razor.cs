@@ -41,7 +41,7 @@ namespace BlazorLastBlocks.Pages {
             if (LoaderMove == 100) {
                 LoaderMove = 0;
             }
-            if (RowCounter == 70) {
+            if (RowCounter > 70) {
                 TxList = new List<BlockWithTransactionHashes>();
             }
         }
